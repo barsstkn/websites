@@ -1,0 +1,165 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import numpy as np
+from datetime import datetime
+import csv
+import os
+
+class NefesAnalizSistemi:
+    def __init__(self):
+        self.window = tk.Tk()
+        self.window.title("Nefes Analizi Sistemi")
+        self.window.geometry("800x600")
+        
+        # Referans değerler (örnek değerler)
+        self.referans_degerler = {
+            'CO2': {'normal': (35000, 45000), 'warning': (30000, 50000)},
+            'VOC': {'normal': (100, 500), 'warning': (50, 1000)},
+            'NO': {'normal': (10, 50), 'warning': (5, 100)},
+            'Acetone': {'normal': (0.5, 2), 'warning': (0.3, 3)},
+            'Humidity': {'normal': (40, 60), 'warning': (30, 70)}
+        }
+        
+        self.setup_gui()
+        self.create_data_file()
+
+    def setup_gui(self):
+        # Ana frame
+        main_frame = ttk.Frame(self.window, padding="10")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+        # Hasta bilgileri
+        patient_frame = ttk.LabelFrame(main_frame, text="Hasta Bilgileri", padding="5")
+        patient_frame.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=5)
+
+        ttk.Label(patient_frame, text="Hasta ID:").grid(row=0, column=0, sticky=tk.W)
+        self.patient_id = ttk.Entry(patient_frame)
+        self.patient_id.grid(row=0, column=1, padx=5)
+
+        ttk.Label(patient_frame, text="Yaş:").grid(row=1, column=0, sticky=tk.W)
+        self.age = ttk.Entry(patient_frame)
+        self.age.grid(row=1, column=1, padx=5)
+
+        # Sensör değerleri
+        sensor_frame = ttk.LabelFrame(main_frame, text="Sensör Değerleri", padding="5")
+        sensor_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=5)
+
+        # Sensör girişleri
+        self.sensor_entries = {}
+        row = 0
+        for sensor in self.referans_degerler.keys():
+            ttk.Label(sensor_frame, text=f"{sensor}:").grid(row=row, column=0, sticky=tk.W)
+            entry = ttk.Entry(sensor_frame)
+            entry.grid(row=row, column=1, padx=5)
+            self.sensor_entries[sensor] = entry
+            row += 1
+
+        # Analiz butonu
+        ttk.Button(main_frame, text="Analiz Et", 
+                  command=self.analyze_breath).grid(row=2, column=0, columnspan=2, pady=10)
+
+        # Sonuç alanı
+        result_frame = ttk.LabelFrame(main_frame, text="Analiz Sonuçları", padding="5")
+        result_frame.grid(row=3, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=5)
+
+        self.result_text = tk.Text(result_frame, height=10, width=60)
+        self.result_text.grid(row=0, column=0, padx=5, pady=5)
+
+    def create_data_file(self):
+        if not os.path.exists('nefes_analizi_kayitlar.csv'):
+            with open('nefes_analizi_kayitlar.csv', 'w', newline='') as file:
+                writer = csv.writer(file)
+                header = ['Tarih', 'Hasta ID', 'Yaş'] + list(self.referans_degerler.keys()) + ['Sonuç']
+                writer.writerow(header)
+
+    def analyze_breath(self):
+        try:
+            # Değerleri al
+            patient_id = self.patient_id.get()
+            age = int(self.age.get())
+            
+            if not patient_id or age <= 0:
+                raise ValueError("Hasta bilgileri eksik veya hatalı!")
+
+            # Sensör değerlerini al ve kontrol et
+            sensor_values = {}
+            anomalies = []
+            warnings = []
+            
+            for sensor, entry in self.sensor_entries.items():
+                try:
+                    value = float(entry.get())
+                    sensor_values[sensor] = value
+                    
+                    # Değerleri kontrol et
+                    normal_range = self.referans_degerler[sensor]['normal']
+                    warning_range = self.referans_degerler[sensor]['warning']
+                    
+                    if value < warning_range[0] or value > warning_range[1]:
+                        anomalies.append(sensor)
+                    elif value < normal_range[0] or value > normal_range[1]:
+                        warnings.append(sensor)
+                        
+                except ValueError:
+                    raise ValueError(f"{sensor} için geçerli bir değer girilmedi!")
+
+            # Sonuçları hazırla
+            result = self.generate_result(anomalies, warnings, sensor_values)
+            
+            # Sonuçları göster
+            self.result_text.delete(1.0, tk.END)
+            self.result_text.insert(tk.END, result)
+            
+            # Kaydet
+            self.save_results(patient_id, age, sensor_values, result)
+
+        except Exception as e:
+            messagebox.showerror("Hata", str(e))
+
+    def generate_result(self, anomalies, warnings, values):
+        
+        result = "Analiz Sonuçları:\n\n"
+        
+        if not anomalies and not warnings:
+            result += "✅ Tüm değerler normal aralıkta.\n"
+        else:
+            if anomalies:
+                result += "❌ Kritik Bulgular:\n"
+                for sensor in anomalies:
+                    result += f"- {sensor}: {values[sensor]} (Normal aralık dışında)\n"
+                    
+                # Hastalık tahminleri
+                if 'CO2' in anomalies:
+                    result += "  → Olası Solunum Sistemi Rahatsızlığı\n"
+                if 'VOC' in anomalies:
+                    result += "  → Olası Karaciğer Fonksiyon Bozukluğu\n"
+                if 'Acetone' in anomalies:
+                    result += "  → Olası Diyabet Belirtisi\n"
+                
+            if warnings:
+                result += "\n⚠️ Uyarılar:\n"
+                for sensor in warnings:
+                    result += f"- {sensor}: {values[sensor]} (İzlenmesi gerekiyor)\n"
+        
+        result += f"\nAnaliz Tarihi: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
+        return result
+
+    def save_results(self, patient_id, age, values, result):
+        with open('nefes_analizi_kayitlar.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            row = [datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
+                  patient_id,
+                  age]
+            
+            for sensor in self.referans_degerler.keys():
+                row.append(values[sensor])
+                
+            row.append(result.replace('\n', ' '))
+            writer.writerow(row)
+
+    def run(self):
+        self.window.mainloop()
+
+if __name__ == "__main__":
+    app = NefesAnalizSistemi()
+    app.run()
