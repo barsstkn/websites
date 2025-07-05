@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Luxe - Tüm Ürünler</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>Vintage Luxe</h1>
+                <span class="subtitle">Lüks Vintage Giyim</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="shop.html" class="active">Tüm Ürünler</a></li>
+                <li><a href="#about">Hakkımızda</a></li>
+                <li><a href="#contact">İletişim</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="favorites.html" class="fav-icon">
+                    <i class="fas fa-heart"></i>
+                    <span class="favorites-count">0</span>
+                </a>
+                <a href="checkout.html" class="cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fas fa-user"></i>
+                        <span id="userName">Giriş Yap</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="login.html" id="loginLink">Giriş Yap</a>
+                        <a href="register.html" id="registerLink">Kayıt Ol</a>
+                        <a href="orders.html" id="ordersLink" style="display: none;">Siparişlerim</a>
+                        <a href="profile.html" id="profileLink" style="display: none;">Profilim</a>
+                        <a href="php/logout.php" id="logoutLink" style="display: none;">Çıkış Yap</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="shop-main">
+        <div class="container">
+            <h2 class="section-title">Tüm Ürünler</h2>
+            <div class="shop-filters">
+                <input type="text" id="searchInput" placeholder="Ürün ara...">
+                <select id="categoryFilter">
+                    <option value="">Tüm Kategoriler</option>
+                    <option value="women">Kadın Giyim</option>
+                    <option value="men">Erkek Giyim</option>
+                    <option value="accessories">Aksesuar</option>
+                </select>
+                <select id="sortFilter">
+                    <option value="newest">En Yeni</option>
+                    <option value="price-low">Fiyat (Düşük-Yüksek)</option>
+                    <option value="price-high">Fiyat (Yüksek-Düşük)</option>
+                </select>
+            </div>
+            <div id="shopProductsGrid" class="products-grid"></div>
+            <div class="load-more">
+                <button id="loadMoreBtn" class="load-more-btn">Daha Fazla Yükle</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Vintage Luxe</h3>
+                    <p>Lüks vintage giyim mağazası</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="index.html">Ana Sayfa</a></li>
+                        <li><a href="shop.html">Tüm Ürünler</a></li>
+                        <li><a href="#about">Hakkımızda</a></li>
+                        <li><a href="#contact">İletişim</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Müşteri Hizmetleri</h4>
+                    <ul>
+                        <li><a href="#">Sipariş Takibi</a></li>
+                        <li><a href="#">İade ve Değişim</a></li>
+                        <li><a href="#">Gizlilik Politikası</a></li>
+                        <li><a href="#">Kullanım Şartları</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Vintage Luxe. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="js/shop.js"></script>
+</body>
+</html> 
